@@ -1,5 +1,8 @@
-import { Vec3, add, div, dot, lerp, mul, norm, sub } from "./vector.js";
-import { WriteBuffer, flatToIPos, invGamma } from "./util.js";
+import { Vec3, add, div, lerp, mul, norm, sub } from "./vector.js";
+import { WriteBuffer, flatToIPos } from "./util.js";
+import { Hittable_List } from "./hittable_list.js";
+import { Interval } from "./interval.js";
+import { Sphere } from "./sphere.js";
 import { Ray } from "./ray.js";
 
 /** @type {HTMLCanvasElement} */
@@ -10,27 +13,13 @@ const context = canvas.getContext("2d");
 const image = context.createImageData(window.innerWidth, window.innerHeight);
 
 /**
- * Returns `true` if a given ray instersects the sphere.
- * @param {Vec3} center 
- * @param {Number} radius 
- * @param {Ray} ray 
- * @returns {Boolean}
- */
-function hit_sphere(center, radius, ray) {
-    const oc = sub(ray.origin, center);
-    const h = dot(ray.direction, oc);
-    const c = dot(oc, oc) - radius * radius;
-    const discriminant = h * h - c;
-    return discriminant >= 0;
-}
-
-/**
  * Returns the colour of a given ray.
  * @param {Ray} ray 
 */
 function ray_colour(ray) {
-    if (hit_sphere(new Vec3(0, 0, -1), 0.5, ray))
-        return new Vec3(1, 0, 0);
+    const hit = world.intersect(ray, new Interval(0, Infinity));
+    if (hit.hasHit)
+        return div(add(hit.normal, new Vec3(1, 1, 1)), 2);
 
     const skyUpColour = new Vec3(0.5, 0.7, 1);
     const skyDownColour = new Vec3(1, 1, 1);
@@ -39,6 +28,12 @@ function ray_colour(ray) {
 
 // Image
 const aspect_ratio = image.width / image.height;
+
+// World
+const world = new Hittable_List;
+
+world.hittables.push(new Sphere(new Vec3(0, 0, -1), 0.5));
+world.hittables.push(new Sphere(new Vec3(0, -100.5, -1), 100));
 
 // Camera
 const focal_length = 1;
@@ -64,9 +59,7 @@ for (let i = 0; i < image.data.length / 4; ++i) {
     const pixel_center = add(pixel00_loc, mul(add(pixel_delta_u, pixel_delta_v), ipos));
     const direction = norm(sub(pixel_center, camera_center));
     const ray = new Ray(camera_center, direction);
-    // Canvas appears to automatically apply gamma conversion to the image once 
-    // it's displayed, so apply inverse gamma to match with the book's image.
-    const colour = invGamma(ray_colour(ray));
+    const colour = ray_colour(ray);
     WriteBuffer(image, i * 4, colour);
 }
 context.putImageData(image, 0, 0);

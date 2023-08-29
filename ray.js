@@ -1,4 +1,4 @@
-import { Vec3, mul } from "./vector.js";
+import { Vec3, add, mul } from "./vector.js";
 
 export class Ray {
     /**
