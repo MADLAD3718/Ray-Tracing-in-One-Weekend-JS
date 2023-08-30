@@ -1,4 +1,4 @@
-import { Lambertian, Metal } from "./material.js";
+import { Dielectric, Lambertian, Metal } from "./material.js";
 import { Hittable_List } from "./hittable_list.js";
 import { Sphere } from "./sphere.js";
 import { Camera } from "./camera.js";
@@ -17,9 +17,9 @@ const cam = new Camera(new Vec3, image);
 const world = new Hittable_List;
 
 const material_ground = new Lambertian(new Vec3(0.8, 0.8, 0));
-const material_center = new Lambertian(new Vec3(0.7, 0.3, 0.3));
-const material_left = new Metal(new Vec3(0.8, 0.8, 0.8), 0.3);
-const material_right = new Metal(new Vec3(0.8, 0.6, 0.2), 1);
+const material_center = new Lambertian(new Vec3(0.1, 0.2, 0.5));
+const material_left = new Dielectric(1.5);
+const material_right = new Metal(new Vec3(0.8, 0.6, 0.2), 0);
 
 world.hittables.push(new Sphere(new Vec3(0, -100.5, -1), 100, material_ground));
 world.hittables.push(new Sphere(new Vec3(0, 0, -1), 0.5, material_center));

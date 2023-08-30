@@ -39,6 +39,15 @@ export function iPosToFlat(image, ipos) {
 }
 
 /**
+ * Returns `x` * `x`.
+ * @param {Number} x 
+ * @returns {Number}
+ */
+export function square(x) {
+    return x * x;
+}
+
+/**
  * Converts a float (0 to 1) to an 8-bit integer (0 to 255).
  * @param {Number} f 
  * @returns {Number}

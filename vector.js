@@ -1,3 +1,5 @@
+import { square } from "./util.js";
+
 export class Vec3 {
     /**
      * Creates a new `Vec3` instance.
@@ -142,19 +144,36 @@ export function reflect(i, n) {
 }
 
 /**
- * Refracts an incident direction through a surface based on each medium's refractive indices.
+ * Refracts an incident direction through a surface based on each medium's refractive index.
  * @param {Vec3} i 
  * @param {Vec3} n 
  * @param {Number} n1 
  * @param {Number} n2 
  * @returns {Vec3}
  */
-export function refract(i, n, n1, n2) {
-    const eta = n1 / n2;
+export function refract(i, n, eta) {
     const cosi = -dot(i, n);
     const sin2t = eta * eta * (1 - cosi * cosi);
     const cost = Math.sqrt(1 - sin2t);
     return add(mul(i, eta), mul(n, eta * cosi - cost));
+}
+
+/**
+ * Returns the fresnel reflectance depending on an incident direction, normal and each medium's refractive index.
+ * @param {Vec3} i 
+ * @param {Vec3} n 
+ * @param {Number} eta 
+ * @returns {Number}
+ */
+export function reflectance(i, n, eta) {
+    let R0 = square((1 - eta) / (1 + eta));
+    let cosx = -dot(i, n);
+    if (eta > 1) {
+        const sin2t = eta * eta * (1 - cosx * cosx);
+        cosx = Math.sqrt(1 - sin2t);
+    }
+    const x = 1 - cosx;
+    return R0 + (1 - R0) * x * x * x * x * x;
 }
 
 /**
