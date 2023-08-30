@@ -11,7 +11,7 @@ canvas.height = window.innerHeight;
 const context = canvas.getContext("2d");
 const image = context.createImageData(window.innerWidth, window.innerHeight);
 
-const cam = new Camera(new Vec3(-2, 2, 1), new Vec3(0, 0, -1), 20, image);
+const cam = new Camera(new Vec3(-2, 2, 1), new Vec3(0, 0, -1), 20, 3.4, 10, image);
 
 // World
 const world = new Hittable_List;

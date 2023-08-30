@@ -238,3 +238,13 @@ export function randSphere() {
     const z = 1 - 2 * u;
     return new Vec3(x, y, z);
 }
+
+/**
+ * Generates a uniform random sample on a 2D disk.
+ * @returns {Vec3}
+ */
+export function randDisk() {
+    const radius = Math.sqrt(Math.random());
+    const phi = 2 * Math.PI * Math.random();
+    return mul(new Vec3(Math.cos(phi), Math.sin(phi), 0), radius);
+}
