@@ -11,7 +11,7 @@ canvas.height = window.innerHeight;
 const context = canvas.getContext("2d");
 const image = context.createImageData(window.innerWidth, window.innerHeight);
 
-const cam = new Camera(new Vec3, image);
+const cam = new Camera(new Vec3(-2, 2, 1), new Vec3(0, 0, -1), 20, image);
 
 // World
 const world = new Hittable_List;
@@ -24,6 +24,7 @@ const material_right = new Metal(new Vec3(0.8, 0.6, 0.2), 0);
 world.hittables.push(new Sphere(new Vec3(0, -100.5, -1), 100, material_ground));
 world.hittables.push(new Sphere(new Vec3(0, 0, -1), 0.5, material_center));
 world.hittables.push(new Sphere(new Vec3(-1, 0, -1), 0.5, material_left));
+world.hittables.push(new Sphere(new Vec3(-1, 0, -1), -0.4, material_left));
 world.hittables.push(new Sphere(new Vec3(1, 0, -1), 0.5, material_right));
 
 // Render

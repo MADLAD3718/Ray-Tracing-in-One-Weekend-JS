@@ -166,7 +166,7 @@ export function refract(i, n, eta) {
  * @returns {Number}
  */
 export function reflectance(i, n, eta) {
-    let R0 = square((1 - eta) / (1 + eta));
+    const R0 = square((1 - eta) / (1 + eta));
     let cosx = -dot(i, n);
     if (eta > 1) {
         const sin2t = eta * eta * (1 - cosx * cosx);

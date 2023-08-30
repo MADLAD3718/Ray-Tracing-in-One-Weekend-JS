@@ -48,6 +48,24 @@ export function square(x) {
 }
 
 /**
+ * Converts an angle from degrees to radians.
+ * @param {Number} degrees 
+ * @returns {Number}
+ */
+export function radians(degrees) {
+    return degrees * Math.PI / 180;
+}
+
+/**
+ * Converts an angle from radians to degrees.
+ * @param {Number} radians 
+ * @returns {Number}
+ */
+export function degrees(radians) {
+    return radians * 180 / Math.PI;
+}
+
+/**
  * Converts a float (0 to 1) to an 8-bit integer (0 to 255).
  * @param {Number} f 
  * @returns {Number}

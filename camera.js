@@ -1,5 +1,5 @@
-import { Vec3, add, div, lerp, mul, norm, sub } from "./vector.js";
-import { WriteBuffer, flatToIPos, gamma } from "./util.js";
+import { Vec3, add, cross, div, lerp, mul, norm, sub } from "./vector.js";
+import { WriteBuffer, flatToIPos, gamma, radians } from "./util.js";
 import { Hittable_List } from "./hittable_list.js";
 import { Interval } from "./interval.js";
 import { Ray } from "./ray.js";
@@ -12,23 +12,28 @@ export class Camera {
      * @param {ImageData} image 
      * @returns {Camera}
      */
-    constructor(position, image) {
+    constructor(position, lookat, fov, image) {
         this.pos = position;
+        this.lookat = lookat;
         this.image = image;
 
+        const w = norm(sub(position, lookat));
+        const u = norm(cross(new Vec3(0, 1, 0), w));
+        const v = cross(w, u);
+
         const aspect_ratio = image.width / image.height;
-        const focal_length = 1;
-        const view_height = 2;
+        const view_height = 2 * Math.tan(radians(fov / 2));
         const view_width = view_height * aspect_ratio;
 
-        this.view.u = new Vec3(view_width, 0, 0);
-        this.view.v = new Vec3(0, -view_height, 0);
+        this.view.u = mul(u, view_width);
+        this.view.v = mul(v, -view_height);
         this.view.du = div(this.view.u, image.width);
         this.view.dv = div(this.view.v, image.height);
 
-        this.view.origin = sub(sub(this.pos, new Vec3(0, 0, focal_length)), div(add(this.view.u, this.view.v), 2));
+        this.view.origin = sub(sub(this.pos, w), div(add(this.view.u, this.view.v), 2));
         this.view.pixel_origin = add(this.view.origin, div(add(this.view.du, this.view.dv), 2));
     }
+    lookat = new Vec3;
     pos = new Vec3;
     dim = new Vec3;
     spp = 10;
@@ -46,6 +51,12 @@ export class Camera {
         v: new Vec3,
         du: new Vec3,
         dv: new Vec3
+    }
+    /** @readonly */
+    basis = {
+        u: new Vec3,
+        v: new Vec3,
+        w: new Vec3
     }
     /**
      * Renders a given world onto the image.
@@ -71,7 +82,7 @@ export class Camera {
      * @returns {Ray}
      */
     generateRay(ipos) {
-        const pixel_center = add(this.view.pixel_origin, mul(add(this.view.du, this.view.dv), ipos));
+        const pixel_center = add(this.view.pixel_origin, add(mul(this.view.du, ipos.x), mul(this.view.dv, ipos.y)));
         const pixel_sample = add(pixel_center, this.samplePixelSquare());
         const direction = norm(sub(pixel_sample, this.pos));
         return new Ray(this.pos, direction);
