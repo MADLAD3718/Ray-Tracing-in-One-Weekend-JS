@@ -1,8 +1,8 @@
 import { Vec3, add, div, lerp, mul, norm, sub } from "./vector.js";
+import { WriteBuffer, flatToIPos } from "./util.js";
 import { Hittable_List } from "./hittable_list.js";
 import { Interval } from "./interval.js";
 import { Ray } from "./ray.js";
-import { WriteBuffer, flatToIPos } from "./util.js";
 
 export class Camera {
     /**
@@ -27,9 +27,11 @@ export class Camera {
         this.view.dv = div(this.view.v, image.height);
 
         this.view.origin = sub(sub(this.pos, new Vec3(0, 0, focal_length)), div(add(this.view.u, this.view.v), 2));
+        this.view.pixel_origin = add(this.view.origin, div(add(this.view.du, this.view.dv), 2));
     }
     pos = new Vec3;
     dim = new Vec3;
+    spp = 5;
     /**
      * @type {ImageData}
      * @readonly
@@ -38,6 +40,7 @@ export class Camera {
     /** @readonly */
     view = {
         origin: new Vec3,
+        pixel_origin: new Vec3,
         u: new Vec3,
         v: new Vec3,
         du: new Vec3,
@@ -49,18 +52,37 @@ export class Camera {
      * @param {Hittable_List} world 
      */
     render(context, world) {
-        const pixel00_loc = add(this.view.origin, div(add(this.view.du, this.view.dv), 2));
         let lasty = 0;
         for (let i = 0; i < this.image.data.length / 4; ++i) {
             const ipos = flatToIPos(this.image, i * 4);
             if (lasty != ipos.y) console.log(`Lines Remaining: ${this.image.height - (lasty = ipos.y) - 1}`);
-            const pixel_center = add(pixel00_loc, mul(add(this.view.du, this.view.dv), ipos));
-            const direction = norm(sub(pixel_center, this.pos));
-            const ray = new Ray(this.pos, direction);
-            const colour = this.rayColour(world, ray);
+            let colour = new Vec3;
+            for (let s = 0; s < this.spp; ++s)
+                colour = add(colour, this.rayColour(world, this.generateRay(ipos)));
+            colour = div(colour, this.spp);
             WriteBuffer(this.image, i * 4, colour);
         }
         context.putImageData(this.image, 0, 0);
+    }
+    /**
+     * Generates a new `Ray` depending on the given image position.
+     * @param {Vec3} ipos 
+     * @returns {Ray}
+     */
+    generateRay(ipos) {
+        const pixel_center = add(this.view.pixel_origin, mul(add(this.view.du, this.view.dv), ipos));
+        const pixel_sample = add(pixel_center, this.samplePixelSquare());
+        const direction = norm(sub(pixel_sample, this.pos));
+        return new Ray(this.pos, direction);
+    }
+    /**
+     * Samples a random position in the pixel bounds.
+     * @returns {Vec3}
+     */
+    samplePixelSquare() {
+        const px = Math.random() - 0.5;
+        const py = Math.random() - 0.5;
+        return add(mul(this.view.du, px), mul(this.view.dv, py));
     }
     /**
      * Returns the colour of a given ray.
