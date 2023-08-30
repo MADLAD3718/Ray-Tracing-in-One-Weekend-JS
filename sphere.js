@@ -1,5 +1,6 @@
 import { Vec3, div, dot, sub } from "./vector.js";
 import { HitInfo, Hittable } from "./hittable.js";
+import { Material } from "./material.js";
 import { Interval } from "./interval.js";
 import { Ray } from "./ray.js";
 
@@ -8,15 +9,19 @@ export class Sphere extends Hittable {
      * Creates a new `Sphere` instance.
      * @param {Vec3} center 
      * @param {Number} radius 
+     * @param {Material} material 
      * @returns {Sphere}
      */
-    constructor(center, radius) {
+    constructor(center, radius, material) {
         super();
         this.center = center;
         this.radius = radius;
+        this.material = material;
     }
     center = new Vec3;
     radius = 0;
+    /** @type {Material} */
+    material;
     /**
      * Returns a `HitInfo` instance describing an intersection with the sphere.
      * @param {Ray} ray 
@@ -39,6 +44,7 @@ export class Sphere extends Hittable {
                 hit.position = ray.at(hit.hitT);
                 hit.normal = div(sub(hit.position, this.center), this.radius);
                 hit.setFaceNormal(ray.direction);
+                hit.material = this.material;
             }
         }
         return hit;

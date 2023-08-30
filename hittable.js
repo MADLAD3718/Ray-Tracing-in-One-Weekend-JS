@@ -1,4 +1,5 @@
 import { Vec3, dot, mul } from "./vector.js";
+import { Material } from "./material.js";
 import { Interval } from "./interval.js";
 import { Ray } from "./ray.js";
 
@@ -7,6 +8,8 @@ export class HitInfo {
     position = new Vec3;
     normal = new Vec3;
     hitT = Infinity;
+    /** @type {Material} */
+    material;
     isFrontFace = true;
     /**
      * Sets the hit normal depending on front or back face intersection.

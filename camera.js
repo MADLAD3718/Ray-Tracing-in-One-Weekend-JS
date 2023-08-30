@@ -1,8 +1,7 @@
-import { Vec3, add, div, lerp, mul, norm, offset, randCosHemisphere, randHemisphere, sub } from "./vector.js";
+import { Vec3, add, div, lerp, mul, norm, sub } from "./vector.js";
 import { WriteBuffer, flatToIPos, gamma } from "./util.js";
 import { Hittable_List } from "./hittable_list.js";
 import { Interval } from "./interval.js";
-import { Basis } from "./basis.js";
 import { Ray } from "./ray.js";
 
 export class Camera {
@@ -33,7 +32,7 @@ export class Camera {
     pos = new Vec3;
     dim = new Vec3;
     spp = 10;
-    max_bounces = 50;
+    max_bounces = 10;
     /**
      * @type {ImageData}
      * @readonly
@@ -97,10 +96,8 @@ export class Camera {
         if (depth < 0) return new Vec3;
         const hit = world.intersect(ray, new Interval(1e-8, Infinity));
         if (hit.hasHit) {
-            const tbn = new Basis(hit.normal);
-            const direction = tbn.localize(randCosHemisphere());
-            const ray = new Ray(hit.position, direction);
-            return mul(this.rayColour(world, ray, depth - 1), 0.5);
+            const scattered = hit.material.scatter(ray, hit);
+            return mul(this.rayColour(world, scattered, depth - 1), hit.material.attenuation());
         }
 
         const skyUpColour = new Vec3(0.5, 0.7, 1);
