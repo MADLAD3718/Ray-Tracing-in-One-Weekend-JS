@@ -41,13 +41,6 @@ export class Camera {
         this.defocus.u = mul(u, defocus_radius);
         this.defocus.v = mul(v, defocus_radius);
     }
-    /** @readonly */
-    defocus = {
-        angle: 0,
-        focal_dist: new Vec3,
-        u: new Vec3,
-        v: new Vec3
-    }
     lookat = new Vec3;
     pos = new Vec3;
     dim = new Vec3;
@@ -66,6 +59,12 @@ export class Camera {
         v: new Vec3,
         du: new Vec3,
         dv: new Vec3
+    }
+    /** @readonly */
+    defocus = {
+        angle: 0,
+        u: new Vec3,
+        v: new Vec3
     }
     /**
      * Renders a given world onto the image.

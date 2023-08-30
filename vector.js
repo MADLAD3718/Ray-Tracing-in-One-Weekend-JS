@@ -177,6 +177,14 @@ export function reflectance(i, n, eta) {
 }
 
 /**
+ * Returns a Vector with 3 random values.
+ * @returns {Vec3}
+ */
+export function randVec3() {
+    return new Vec3(Math.random(), Math.random(), Math.random());
+}
+
+/**
  * Generates a uniform randomly sampled direction on a hemisphere.
  * @returns {Vec3}
  */
