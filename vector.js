@@ -122,6 +122,16 @@ export function lerp(u, v, s) {
 }
 
 /**
+ * Offsets a position by a normal.
+ * @param {Vec3} p 
+ * @param {Vec3} n 
+ * @returns {Vec3}
+ */
+export function offset(p, n) {
+    return add(p, mul(n, 1e-8));
+}
+
+/**
  * Reflects an incident direction off of a normal.
  * @param {Vec3} i 
  * @param {Vec3} n 

@@ -1,7 +1,8 @@
-import { Vec3, add, div, lerp, mul, norm, sub } from "./vector.js";
-import { WriteBuffer, flatToIPos } from "./util.js";
+import { Vec3, add, div, lerp, mul, norm, offset, randCosHemisphere, randHemisphere, sub } from "./vector.js";
+import { WriteBuffer, flatToIPos, gamma } from "./util.js";
 import { Hittable_List } from "./hittable_list.js";
 import { Interval } from "./interval.js";
+import { Basis } from "./basis.js";
 import { Ray } from "./ray.js";
 
 export class Camera {
@@ -31,7 +32,8 @@ export class Camera {
     }
     pos = new Vec3;
     dim = new Vec3;
-    spp = 5;
+    spp = 10;
+    max_bounces = 50;
     /**
      * @type {ImageData}
      * @readonly
@@ -58,8 +60,8 @@ export class Camera {
             if (lasty != ipos.y) console.log(`Lines Remaining: ${this.image.height - (lasty = ipos.y) - 1}`);
             let colour = new Vec3;
             for (let s = 0; s < this.spp; ++s)
-                colour = add(colour, this.rayColour(world, this.generateRay(ipos)));
-            colour = div(colour, this.spp);
+                colour = add(colour, this.rayColour(world, this.generateRay(ipos), this.max_bounces));
+            colour = gamma(div(colour, this.spp));
             WriteBuffer(this.image, i * 4, colour);
         }
         context.putImageData(this.image, 0, 0);
@@ -88,12 +90,18 @@ export class Camera {
      * Returns the colour of a given ray.
      * @param {Hittable_List} world 
      * @param {Ray} ray 
+     * @param {Number} depth 
      * @returns {Vec3}
      */
-    rayColour(world, ray) {
-        const hit = world.intersect(ray, new Interval(0, Infinity));
-        if (hit.hasHit)
-            return div(add(hit.normal, new Vec3(1, 1, 1)), 2);
+    rayColour(world, ray, depth) {
+        if (depth < 0) return new Vec3;
+        const hit = world.intersect(ray, new Interval(1e-8, Infinity));
+        if (hit.hasHit) {
+            const tbn = new Basis(hit.normal);
+            const direction = tbn.localize(randCosHemisphere());
+            const ray = new Ray(hit.position, direction);
+            return mul(this.rayColour(world, ray, depth - 1), 0.5);
+        }
 
         const skyUpColour = new Vec3(0.5, 0.7, 1);
         const skyDownColour = new Vec3(1, 1, 1);
