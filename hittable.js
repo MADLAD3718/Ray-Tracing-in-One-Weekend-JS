@@ -1,12 +1,13 @@
 import { Vec3, dot, mul } from "./vector.js";
 import { Material } from "./material.js";
 import { Interval } from "./interval.js";
+import { AABB } from "./aabb.js";
 import { Ray } from "./ray.js";
 
 export class HitInfo {
     hasHit = false;
-    position = new Vec3;
-    normal = new Vec3;
+    position;
+    normal;
     hitT = Infinity;
     /** @type {Material} */
     material;
@@ -22,6 +23,8 @@ export class HitInfo {
 }
 
 export class Hittable {
+    /** @type {AABB} */
+    bounding_box;
     /**
      * Returns a `HitInfo` instance describing an intersection with the object.
      * @param {Ray} ray 

@@ -2,6 +2,7 @@ import { Vec3, add, cross, div, length, lerp, mul, norm, randDisk, sub } from ".
 import { WriteBuffer, flatToIPos, gamma, radians } from "./util.js";
 import { Hittable_List } from "./hittable_list.js";
 import { Interval } from "./interval.js";
+import { BVH_Node } from "./bvh.js";
 import { Ray } from "./ray.js";
 
 export class Camera {
@@ -73,10 +74,11 @@ export class Camera {
      */
     render(context, world) {
         let j = 0;
+        const start_time = performance.now();
         const render_id = setInterval(() => {
             context.fillRect(0, 0, 1, 1);
             for (let i = 0; i < this.image.width; ++i) {
-                const ipos = flatToIPos(this.image, (j * this.image.width + i) * 4);
+                const ipos = new Vec3(i, j, 0);
                 let colour = new Vec3;
                 for (let s = 0; s < this.spp; ++s)
                     colour = add(colour, this.rayColour(world, this.generateRay(ipos), this.max_bounces));
@@ -84,7 +86,11 @@ export class Camera {
                 WriteBuffer(this.image, (j * this.image.width + i) * 4, colour);
             }
             context.putImageData(this.image, 0, 0);
-            if (++j >= this.image.height) return clearInterval(render_id);
+            if (++j >= this.image.height) {
+                const renderTime = (performance.now() - start_time) / 1000;
+                console.log(`Render Time: ${renderTime.toFixed(3)}s.`);
+                return clearInterval(render_id);
+            }
         });
     }
     /**
@@ -118,7 +124,7 @@ export class Camera {
     }
     /**
      * Returns the colour of a given ray.
-     * @param {Hittable_List} world 
+     * @param {BVH_Node} world 
      * @param {Ray} ray 
      * @param {Number} depth 
      * @returns {Vec3}

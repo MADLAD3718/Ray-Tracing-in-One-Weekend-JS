@@ -1,7 +1,8 @@
-import { Vec3, div, dot, lerp, sub } from "./vector.js";
+import { Vec3, add, div, dot, lerp, sub } from "./vector.js";
 import { HitInfo, Hittable } from "./hittable.js";
 import { Material } from "./material.js";
 import { Interval } from "./interval.js";
+import { AABB } from "./aabb.js";
 import { Ray } from "./ray.js";
 
 export class Sphere extends Hittable {
@@ -16,10 +17,14 @@ export class Sphere extends Hittable {
     constructor(center0, center1, radius, material) {
         super();
         this.center0 = center0;
-        if (center1 != undefined) this.isMoving = true;
-        this.center1 = center1;
+        if (center1 != undefined) {
+            this.isMoving = true;
+            this.center1 = center1;
+        }
         this.radius = radius;
         this.material = material;
+        const rvec = new Vec3(radius, radius, radius);
+        this.bounding_box = new AABB(sub(this.center0, rvec), add(this.center0, rvec));
     }
     center0 = new Vec3;
     /** @type {Vec3 | undefined} */

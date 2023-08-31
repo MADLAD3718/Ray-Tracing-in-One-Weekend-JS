@@ -16,5 +16,5 @@ export class Ray {
     origin = new Vec3;
     direction = new Vec3;
     time = 0;
-    at = (t) => {return add(this.origin, mul(this.direction, t))}
+    at(t) {return add(this.origin, mul(this.direction, t))}
 }
