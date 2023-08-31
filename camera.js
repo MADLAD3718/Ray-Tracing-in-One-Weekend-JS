@@ -44,7 +44,7 @@ export class Camera {
     lookat = new Vec3;
     pos = new Vec3;
     dim = new Vec3;
-    spp = 10;
+    spp = 5;
     max_bounces = 10;
     /**
      * @type {ImageData}
@@ -72,17 +72,20 @@ export class Camera {
      * @param {Hittable_List} world 
      */
     render(context, world) {
-        let lasty = 0;
-        for (let i = 0; i < this.image.data.length / 4; ++i) {
-            const ipos = flatToIPos(this.image, i * 4);
-            if (lasty != ipos.y) console.log(`Lines Remaining: ${this.image.height - (lasty = ipos.y) - 1}`);
-            let colour = new Vec3;
-            for (let s = 0; s < this.spp; ++s)
-                colour = add(colour, this.rayColour(world, this.generateRay(ipos), this.max_bounces));
-            colour = gamma(div(colour, this.spp));
-            WriteBuffer(this.image, i * 4, colour);
-        }
-        context.putImageData(this.image, 0, 0);
+        let j = 0;
+        const render_id = setInterval(() => {
+            context.fillRect(0, 0, 1, 1);
+            for (let i = 0; i < this.image.width; ++i) {
+                const ipos = flatToIPos(this.image, (j * this.image.width + i) * 4);
+                let colour = new Vec3;
+                for (let s = 0; s < this.spp; ++s)
+                    colour = add(colour, this.rayColour(world, this.generateRay(ipos), this.max_bounces));
+                colour = gamma(div(colour, this.spp));
+                WriteBuffer(this.image, (j * this.image.width + i) * 4, colour);
+            }
+            context.putImageData(this.image, 0, 0);
+            if (++j >= this.image.height) return clearInterval(render_id);
+        });
     }
     /**
      * Generates a new `Ray` depending on the given image position.
@@ -94,7 +97,7 @@ export class Camera {
         const pixel_sample = add(pixel_center, this.samplePixelSquare());
         const origin = this.defocus.angle <= 0 ? this.pos : this.sampleDefocusDisk();
         const direction = norm(sub(pixel_sample, origin));
-        return new Ray(origin, direction);
+        return new Ray(origin, direction, Math.random());
     }
     /**
      * Samples a random position in the pixel bounds.

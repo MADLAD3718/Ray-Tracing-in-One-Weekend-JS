@@ -38,7 +38,7 @@ export class Lambertian extends Material {
     scatter(ray, hit) {
         const tbn = new Basis(hit.normal);
         const direction = tbn.localize(randCosHemisphere());
-        return new Ray(hit.position, direction);
+        return new Ray(hit.position, direction, ray.time);
     }
     /**
      * Returns the attenuation of the material.
@@ -70,7 +70,7 @@ export class Metal extends Material {
     scatter(ray, hit) {
         const tbn = new Basis(reflect(ray.direction, hit.normal));
         const direction = tbn.localize(normRandDisk(this.fuzz));
-        return new Ray(hit.position, direction);
+        return new Ray(hit.position, direction, ray.time);
     }
     /**
      * Returns the attenuation of the material.
@@ -103,7 +103,7 @@ export class Dielectric extends Material {
         const TIR = 1 - 1 / (eta * eta) > cost * cost;
         if (!TIR && reflectance(ray.direction, hit.normal, eta) < Math.random()) direction = refract(ray.direction, hit.normal, eta);
         else direction = reflect(ray.direction, hit.normal);
-        return new Ray(hit.position, direction);
+        return new Ray(hit.position, direction, ray.time);
     }
     /**
      * Returns the attenuation of the material.

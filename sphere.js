@@ -1,4 +1,4 @@
-import { Vec3, div, dot, sub } from "./vector.js";
+import { Vec3, div, dot, lerp, sub } from "./vector.js";
 import { HitInfo, Hittable } from "./hittable.js";
 import { Material } from "./material.js";
 import { Interval } from "./interval.js";
@@ -7,21 +7,33 @@ import { Ray } from "./ray.js";
 export class Sphere extends Hittable {
     /**
      * Creates a new `Sphere` instance.
-     * @param {Vec3} center 
+     * @param {Vec3} center0 
+     * @param {Vec3} [center1] 
      * @param {Number} radius 
      * @param {Material} material 
      * @returns {Sphere}
      */
-    constructor(center, radius, material) {
+    constructor(center0, center1, radius, material) {
         super();
-        this.center = center;
+        this.center0 = center0;
+        if (center1 != undefined) this.isMoving = true;
+        this.center1 = center1;
         this.radius = radius;
         this.material = material;
     }
-    center = new Vec3;
+    center0 = new Vec3;
+    /** @type {Vec3 | undefined} */
+    center1;
+    isMoving = false;
     radius = 0;
     /** @type {Material} */
     material;
+    /**
+     * Returns the center of the sphere based on the input time.
+     * @param {Number} time 
+     * @returns {Vec3}
+     */
+    center(time) { return lerp(this.center0, this.center1, time); }
     /**
      * Returns a `HitInfo` instance describing an intersection with the sphere.
      * @param {Ray} ray 
@@ -30,7 +42,8 @@ export class Sphere extends Hittable {
      */
     intersect(ray, interval) {
         const hit = new HitInfo;
-        const oc = sub(ray.origin, this.center);
+        const center = this.isMoving ? this.center(ray.time) : this.center0;
+        const oc = sub(ray.origin, center);
         const h = dot(ray.direction, oc);
         const c = dot(oc, oc) - this.radius * this.radius;
         const discriminant = h * h - c;
@@ -42,7 +55,7 @@ export class Sphere extends Hittable {
             if (hit.hasHit) {
                 hit.hitT = t1 < t2 ? interval.surrounds(t1) ? t1 : t2 : t2;
                 hit.position = ray.at(hit.hitT);
-                hit.normal = div(sub(hit.position, this.center), this.radius);
+                hit.normal = div(sub(hit.position, center), this.radius);
                 hit.setFaceNormal(ray.direction);
                 hit.material = this.material;
             }
