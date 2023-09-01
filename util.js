@@ -66,6 +66,15 @@ export function degrees(radians) {
 }
 
 /**
+ * Converts an 8-bit integer to a float.
+ * @param {Number} n 
+ * @returns {Number}
+ */
+export function toFloat(n) {
+    return n / 255;
+}
+
+/**
  * Converts a float (0 to 1) to an 8-bit integer (0 to 255).
  * @param {Number} f 
  * @returns {Number}
@@ -85,4 +94,17 @@ export function WriteBuffer(image, i, colour) {
     image.data[i + 1] = toUint8(colour.y);
     image.data[i + 2] = toUint8(colour.z);
     image.data[i + 3] = 255;
+}
+
+/**
+ * Reads a colour from a given position in an image buffer.
+ * @param {ImageData} image 
+ * @param {Vec3} ipos 
+ * @returns {Vec3}
+ */
+export function ReadBuffer(image, ipos) {
+    const i = iPosToFlat(image, ipos);
+    return new Vec3(toFloat(image.data[i]),
+                    toFloat(image.data[i + 1]),
+                    toFloat(image.data[i + 2]));
 }

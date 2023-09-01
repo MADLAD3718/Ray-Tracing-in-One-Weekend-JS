@@ -11,7 +11,9 @@ export class HitInfo {
     hitT = Infinity;
     /** @type {Material} */
     material;
-    isFrontFace = true;
+    /** @type {Vec3} */
+    uv;
+    isFrontFace;
     /**
      * Sets the hit normal depending on front or back face intersection.
      * @param {Vec3} direction 

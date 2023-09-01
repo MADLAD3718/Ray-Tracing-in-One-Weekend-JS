@@ -40,6 +40,16 @@ export class Sphere extends Hittable {
      */
     center(time) { return lerp(this.center0, this.center1, time); }
     /**
+     * Returns the uv coordinates on the sphere depending on a position.
+     * @param {Vec3} p 
+     * @returns {Vec3}
+     */
+    getSphereUV(p) {
+        const theta = Math.acos(p.y);
+        const phi = Math.atan2(-p.z, p.x) + Math.PI;
+        return new Vec3(phi / (2 * Math.PI), theta / Math.PI);
+    }
+    /**
      * Returns a `HitInfo` instance describing an intersection with the sphere.
      * @param {Ray} ray 
      * @param {Interval} interval 
@@ -63,6 +73,7 @@ export class Sphere extends Hittable {
                 hit.normal = div(sub(hit.position, center), this.radius);
                 hit.setFaceNormal(ray.direction);
                 hit.material = this.material;
+                hit.uv = this.getSphereUV(hit.normal);
             }
         }
         return hit;

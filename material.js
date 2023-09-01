@@ -1,5 +1,6 @@
 import { Vec3, dot, normRandDisk, randCosHemisphere, reflect, reflectance, refract } from "./vector.js";
 import { HitInfo } from "./hittable.js";
+import { Texture } from "./texture.js";
 import { Basis } from "./basis.js";
 import { Ray } from "./ray.js";
 
@@ -13,22 +14,24 @@ export class Material {
     scatter(ray, hit) {}
     /**
      * Returns the attenuation of the material.
+     * @param {Vec3} uv 
+     * @param {Vec3} p 
      * @returns {Vec3}
      */
-    attenuation() {}
+    attenuation(uv, p) {}
 }
 
 export class Lambertian extends Material {
     /**
      * Creates a new `Lambertian` material instance.
-     * @param {Vec3} albedo 
+     * @param {Texture} texture 
      * @returns {Lambertian}
      */
-    constructor(albedo) {
+    constructor(texture) {
         super();
-        this.albedo = albedo;
+        this.texture = texture;
     }
-    albedo = new Vec3;
+    texture;
     /**
      * Scatters an incident ray off of the material, returning the scattered ray.
      * @param {Ray} ray 
@@ -42,24 +45,26 @@ export class Lambertian extends Material {
     }
     /**
      * Returns the attenuation of the material.
+     * @param {Vec3} uv 
+     * @param {Vec3} p 
      * @returns {Vec3}
      */
-    attenuation() {return this.albedo;}
+    attenuation(uv, p) { return this.texture.sample(uv, p); }
 }
 
 export class Metal extends Material {
     /**
      * Creates a new `Metal` material instance.
-     * @param {Vec3} albedo 
+     * @param {Texture} texture 
      * @param {Number | undefined} fuzz 
      * @returns {Metal}
      */
-    constructor(albedo, fuzz) {
+    constructor(texture, fuzz) {
         super();
-        this.albedo = albedo;
+        this.texture = texture;
         this.fuzz = fuzz ?? 0;
     }
-    albedo = new Vec3;
+    texture;
     fuzz = 0;
     /**
      * Scatters an incident ray off of the material, returning the scattered ray.
@@ -74,9 +79,11 @@ export class Metal extends Material {
     }
     /**
      * Returns the attenuation of the material.
+     * @param {Vec3} uv 
+     * @param {Vec3} p 
      * @returns {Vec3}
      */
-    attenuation() {return this.albedo;}
+    attenuation(uv, p) { return this.texture.sample(uv, p); }
 }
 
 export class Dielectric extends Material {
@@ -107,7 +114,9 @@ export class Dielectric extends Material {
     }
     /**
      * Returns the attenuation of the material.
+     * @param {Vec3} uv 
+     * @param {Vec3} p 
      * @returns {Vec3}
      */
-    attenuation() {return new Vec3(1, 1, 1);}
+    attenuation(uv, p) { return new Vec3(1, 1, 1); }
 }

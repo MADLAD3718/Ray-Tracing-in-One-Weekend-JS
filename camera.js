@@ -1,5 +1,5 @@
-import { Vec3, add, cross, div, length, lerp, mul, norm, randDisk, sub } from "./vector.js";
-import { WriteBuffer, flatToIPos, gamma, radians } from "./util.js";
+import { Vec3, add, cross, div, lerp, mul, norm, randDisk, sub } from "./vector.js";
+import { WriteBuffer, gamma, radians } from "./util.js";
 import { Hittable_List } from "./hittable_list.js";
 import { Interval } from "./interval.js";
 import { BVH_Node } from "./bvh.js";
@@ -45,7 +45,7 @@ export class Camera {
     lookat = new Vec3;
     pos = new Vec3;
     dim = new Vec3;
-    spp = 5;
+    spp = 10;
     max_bounces = 10;
     /**
      * @type {ImageData}
@@ -134,7 +134,7 @@ export class Camera {
         const hit = world.intersect(ray, new Interval(1e-8, Infinity));
         if (hit.hasHit) {
             const scattered = hit.material.scatter(ray, hit);
-            return mul(this.rayColour(world, scattered, depth - 1), hit.material.attenuation());
+            return mul(this.rayColour(world, scattered, depth - 1), hit.material.attenuation(hit.uv));
         }
 
         const skyUpColour = new Vec3(0.5, 0.7, 1);

@@ -1,6 +1,6 @@
-import { HitInfo, Hittable } from "./hittable.js";
 import { Hittable_List } from "./hittable_list.js";
-import { AABB, surroundingBox } from "./aabb.js";
+import { HitInfo, Hittable } from "./hittable.js";
+import { surroundingBox } from "./aabb.js";
 
 export class BVH_Node extends Hittable {
     /**
