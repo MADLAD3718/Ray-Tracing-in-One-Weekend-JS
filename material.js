@@ -18,7 +18,18 @@ export class Material {
      * @param {Vec3} p 
      * @returns {Vec3}
      */
-    attenuation(uv, p) {}
+    attenuation(uv, p) {
+        return new Vec3(1, 1, 1);
+    }
+    /**
+     * Returns the emitted light at a given point on the surface.
+     * @param {Vec3} uv 
+     * @param {Vec3} p 
+     * @returns {Vec3}
+     */
+    emitted(uv, p) {
+        return new Vec3(0, 0, 0);
+    }
 }
 
 export class Lambertian extends Material {
@@ -112,11 +123,35 @@ export class Dielectric extends Material {
         else direction = reflect(ray.direction, hit.normal);
         return new Ray(hit.position, direction, ray.time);
     }
+}
+
+export class Light extends Material {
     /**
-     * Returns the attenuation of the material.
+     * Creates a new `Light` material instance.
+     * @param {Texture} emission 
+     * @returns {Light}
+     */
+    constructor(emission) {
+        super();
+        this.emission = emission;
+    }
+    emission;
+    /**
+     * Scatters an incident ray off of the material, returning the scattered ray.
+     * @param {Ray} ray 
+     * @param {HitInfo} hit 
+     * @returns {Ray}
+     */
+    scatter(ray, hit) {
+        return undefined;
+    }
+    /**
+     * Returns the emitted light at a given point on the surface.
      * @param {Vec3} uv 
      * @param {Vec3} p 
      * @returns {Vec3}
      */
-    attenuation(uv, p) { return new Vec3(1, 1, 1); }
+    emitted(uv, p) {
+        return this.emission.sample(uv, p);
+    }
 }

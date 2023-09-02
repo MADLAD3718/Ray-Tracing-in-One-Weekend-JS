@@ -36,6 +36,7 @@ export class Quad extends Hittable {
      */
     intersect(ray, interval) {
         const hit = new HitInfo;
+        if (!this.bounding_box.intersect(ray, interval).hasHit) return hit;
         // Using Cramer's Rule to determine alpha, beta and t for ray/quad intersection.
         const oq = sub(ray.origin, this.origin);
         const invDet = 1 / -det(this.u, this.v, ray.direction);

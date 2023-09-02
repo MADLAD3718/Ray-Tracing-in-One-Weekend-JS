@@ -1,6 +1,6 @@
 import { Checker_Texture, Image_Texture, Noise_Texture, Solid_Colour } from "./texture.js";
 import { Vec3, add, length, mul, randVec3, sub } from "./vector.js";
-import { Dielectric, Lambertian, Metal } from "./material.js";
+import { Dielectric, Lambertian, Light, Metal } from "./material.js";
 import { Hittable_List } from "./hittable_list.js";
 import { Interval } from "./interval.js";
 import { Sphere } from "./sphere.js";
@@ -14,8 +14,6 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 const context = canvas.getContext("2d");
 const image = context.createImageData(window.innerWidth, window.innerHeight);
-
-const cam = new Camera(new Vec3(13, 2, 3), new Vec3(0, 0, 0), 20, 10, 0, image);
 
 function random_spheres() {
     const world = new Hittable_List;
@@ -52,7 +50,7 @@ function random_spheres() {
         if (a.bounding_box.x.min == b.bounding_box.x.min) return 0;
         return 1;
     });
-    const bvh = new BVH_Node(world, 0, world.hittables.length - 1);
+    const cam = new Camera(new Vec3(13, 2, 3), new Vec3(0, 0, 0), 20, 10, 0, new Vec3(0.7, 0.8, 1), image);
     cam.render(context, world);
 }
 
@@ -64,7 +62,7 @@ function two_spheres() {
     world.add(new Sphere(new Vec3(0, -10, 0), undefined, 10, new Lambertian(checker)));
     world.add(new Sphere(new Vec3(0, 10, 0), undefined, 10, new Lambertian(checker)));
 
-    const cam = new Camera(new Vec3(13, 2, 3), new Vec3(0, 0, 0), 20, 1, 0, image);
+    const cam = new Camera(new Vec3(13, 2, 3), new Vec3(0, 0, 0), 20, 1, 0, new Vec3(0.7, 0.8, 1), image);
     cam.render(context, world);
 }
 
@@ -81,7 +79,7 @@ function earth() {
         const texture = new Image_Texture(data);
         const world = new Hittable_List;
         world.add(new Sphere(new Vec3, undefined, 2, new Lambertian(texture)));
-        const cam = new Camera(new Vec3(0, 0, 12), new Vec3(0, 0, 0), 20, 1, 0, image);
+        const cam = new Camera(new Vec3(0, 0, 12), new Vec3(0, 0, 0), 20, 1, 0, new Vec3(0.7, 0.8, 1), image);
         cam.render(context, world);
         addEventListener("click", (event) => {
             const ipos = new Vec3(event.pageX, event.pageY, 0);
@@ -98,7 +96,7 @@ function two_perlin_spheres() {
     world.add(new Sphere(new Vec3(0, -1000, 0), undefined, 1000, new Lambertian(perlin_texture)));
     world.add(new Sphere(new Vec3(0, 2, 0), undefined, 2, new Lambertian(perlin_texture)));
 
-    const cam = new Camera(new Vec3(13, 2, 3), new Vec3(0, 0, 0), 20, 1, 0, image);
+    const cam = new Camera(new Vec3(13, 2, 3), new Vec3(0, 0, 0), 20, 1, 0, new Vec3(0.7, 0.8, 1), image);
     cam.render(context, world);
 }
 
@@ -117,14 +115,50 @@ function quads() {
     world.add(new Quad(new Vec3(-2, 3, 1), new Vec3(4, 0, 0), new Vec3(0, 0, 4), upper_orange));
     world.add(new Quad(new Vec3(-2, -3, 5), new Vec3(4, 0, 0), new Vec3(0, 0, -4), lower_teal));
 
-    const cam = new Camera(new Vec3(0, 0, 9), new Vec3(0, 0, 0), 80, 1, 0, image);
+    const cam = new Camera(new Vec3(0, 0, 9), new Vec3(0, 0, 0), 80, 1, 0, new Vec3(0.7, 0.8, 1), image);
     cam.render(context, world);
 }
 
-switch(5) {
+function simple_light() {
+    const world = new Hittable_List;
+
+    const perlin_texture = new Noise_Texture(4);
+    world.add(new Sphere(new Vec3(0, -1000, 0), undefined, 1000, new Lambertian(perlin_texture)));
+    world.add(new Sphere(new Vec3(0, 2, 0), undefined, 2, new Lambertian(perlin_texture)));
+
+    const light = new Light(new Solid_Colour(new Vec3(4, 4, 4)));
+    world.add(new Sphere(new Vec3(0, 7, 0), undefined, 2, light));
+    world.add(new Quad(new Vec3(3, 1, -2), new Vec3(2, 0, 0), new Vec3(0, 2, 0), light));
+
+    const cam = new Camera(new Vec3(26, 3, 6), new Vec3(0, 2, 0), 20, 1, 0, new Vec3(0, 0, 0), image);
+    cam.render(context, world);
+}
+
+function cornell_box() {
+    const world = new Hittable_List;
+
+    const red = new Lambertian(new Solid_Colour(new Vec3(0.65, 0.05, 0.05)));
+    const white = new Lambertian(new Solid_Colour(new Vec3(0.73, 0.73, 0.73)));
+    const green = new Lambertian(new Solid_Colour(new Vec3(0.12, 0.45, 0.15)));
+    const light = new Light(new Solid_Colour(new Vec3(15, 15, 15)));
+
+    world.add(new Quad(new Vec3(555, 0, 0), new Vec3(0, 555, 0), new Vec3(0, 0, 555), green));
+    world.add(new Quad(new Vec3(0, 0, 0), new Vec3(0, 555, 0), new Vec3(0, 0, 555), red));
+    world.add(new Quad(new Vec3(343, 554, 332), new Vec3(-130, 0, 0), new Vec3(0, 0, -105), light));
+    world.add(new Quad(new Vec3(0, 0, 0), new Vec3(555, 0, 0), new Vec3(0, 0, 555), white));
+    world.add(new Quad(new Vec3(555, 555, 555), new Vec3(-555, 0, 0), new Vec3(0, 0, -555), white));
+    world.add(new Quad(new Vec3(0, 0, 555), new Vec3(555, 0, 0), new Vec3(0, 555, 0), white));
+
+    const cam = new Camera(new Vec3(278, 278, -800), new Vec3(278, 278, 0), 40, 1, 0, new Vec3(0, 0, 0), image);
+    cam.render(context, world);
+}
+
+switch(7) {
     case 1: random_spheres();       break;
     case 2: two_spheres();          break;
     case 3: earth();                break;
     case 4: two_perlin_spheres();   break;
     case 5: quads();                break;
+    case 6: simple_light();         break;
+    case 7: cornell_box();          break;
 }

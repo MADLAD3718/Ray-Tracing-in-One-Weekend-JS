@@ -18,6 +18,10 @@ export class AABB {
     x = new Interval;
     y = new Interval;
     z = new Interval;
+    /**
+     * Expands the bounds of the `AABB`.
+     * @param {Number} delta 
+     */
     expand(delta) {
         this.x.min -= delta;
         this.y.min -= delta;

@@ -13,13 +13,15 @@ export class Camera {
      * @param {Number} fov 
      * @param {Number} focal_dist 
      * @param {Number} defocus_angle 
+     * @param {Vec3} background 
      * @param {ImageData} image 
      * @returns {Camera}
      */
-    constructor(position, lookat, fov, focal_dist, defocus_angle, image) {
+    constructor(position, lookat, fov, focal_dist, defocus_angle, background, image) {
         this.pos = position;
         this.lookat = lookat;
         this.defocus.angle = defocus_angle;
+        this.background = background;
         this.image = image;
         
         const aspect_ratio = image.width / image.height;
@@ -42,10 +44,10 @@ export class Camera {
         this.defocus.u = mul(u, defocus_radius);
         this.defocus.v = mul(v, defocus_radius);
     }
-    lookat = new Vec3;
-    pos = new Vec3;
-    dim = new Vec3;
-    spp = 10;
+    lookat;
+    pos;
+    background;
+    spp = 100;
     max_bounces = 10;
     /**
      * @type {ImageData}
@@ -132,13 +134,11 @@ export class Camera {
     rayColour(world, ray, depth) {
         if (depth < 0) return new Vec3;
         const hit = world.intersect(ray, new Interval(1e-8, Infinity));
-        if (hit.hasHit) {
-            const scattered = hit.material.scatter(ray, hit);
-            return mul(this.rayColour(world, scattered, depth - 1), hit.material.attenuation(hit.uv, hit.position));
-        }
-
-        const skyUpColour = new Vec3(0.5, 0.7, 1);
-        const skyDownColour = new Vec3(1, 1, 1);
-        return lerp(skyDownColour, skyUpColour, ray.direction.y * 0.5 + 0.5);
+        if (!hit.hasHit) return this.background;
+        const scattered = hit.material.scatter(ray, hit);
+        if (!scattered) return hit.material.emitted(hit.uv, hit.position);
+        const emissive_colour = hit.material.emitted(hit.uv, hit.position);
+        const scatter_colour = mul(this.rayColour(world, scattered, depth - 1), hit.material.attenuation(hit.uv, hit.position));
+        return add(emissive_colour, scatter_colour);
     }
 }

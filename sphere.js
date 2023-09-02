@@ -57,6 +57,7 @@ export class Sphere extends Hittable {
      */
     intersect(ray, interval) {
         const hit = new HitInfo;
+        if (!this.bounding_box.intersect(ray, interval).hasHit) return hit;
         const center = this.isMoving ? this.center(ray.time) : this.center0;
         const oc = sub(ray.origin, center);
         const h = dot(ray.direction, oc);
