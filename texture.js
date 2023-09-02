@@ -108,7 +108,7 @@ export class Noise_Texture extends Texture {
      */
     sample(uv, p) {
         const s = mul(p, this.scale);
-        const noise = 0.5 * (1 + Math.sin(s.z + 10 * this.noise.turb(s)));
+        const noise = 0.5 * (1 + Math.sin(s.z + 5 * this.noise.turb(s)));
         return mul(new Vec3(1, 1, 1), noise);
     }
 }

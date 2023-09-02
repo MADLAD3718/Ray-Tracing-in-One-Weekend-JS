@@ -1,10 +1,10 @@
-import { Vec3, dot, mul, randHemisphere, randSphere } from "./vector.js";
+import { Vec3, dot, mul, randSphere } from "./vector.js";
 
 export class Perlin {
     constructor() {
         this.randVec = new Array(this.point_count);
         for (let i = 0; i < this.point_count; ++i)
-            this.randVec[i] = randHemisphere();
+            this.randVec[i] = randSphere();
         this.perm_x = this.perlin_generate_perm();
         this.perm_y = this.perlin_generate_perm();
         this.perm_z = this.perlin_generate_perm();

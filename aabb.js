@@ -18,6 +18,14 @@ export class AABB {
     x = new Interval;
     y = new Interval;
     z = new Interval;
+    expand(delta) {
+        this.x.min -= delta;
+        this.y.min -= delta;
+        this.z.min -= delta;
+        this.x.max += delta;
+        this.y.max += delta;
+        this.z.max += delta;
+    }
     /**
      * Returns the corresponding axis according to `n`.
      * @param {Number} n 

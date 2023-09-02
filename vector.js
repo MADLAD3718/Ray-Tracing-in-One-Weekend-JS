@@ -85,6 +85,17 @@ export function cross(u, v) {
 }
 
 /**
+ * Returns the determinant of a matrix consisting of `u`, `v` and `w`.
+ * @param {Vec3} u 
+ * @param {Vec3} v 
+ * @param {Vec3} w 
+ * @returns {Number}
+ */
+export function det(u, v, w) {
+    return dot(u, cross(v, w));
+}
+
+/**
  * Returns the length of `u`.
  * @param {Vec3} u 
  * @returns {Number}

@@ -6,6 +6,7 @@ import { Interval } from "./interval.js";
 import { Sphere } from "./sphere.js";
 import { Camera } from "./camera.js";
 import { BVH_Node } from "./bvh.js";
+import { Quad } from "./quad.js";
 
 /** @type {HTMLCanvasElement} */
 const canvas = document.getElementById("screen");
@@ -101,9 +102,29 @@ function two_perlin_spheres() {
     cam.render(context, world);
 }
 
-switch(4) {
+function quads() {
+    const world = new Hittable_List;
+
+    const left_red = new Lambertian(new Solid_Colour(new Vec3(1, 0.2, 0.2)));
+    const back_green = new Lambertian(new Solid_Colour(new Vec3(0.2, 1, 0.2)));
+    const right_blue = new Lambertian(new Solid_Colour(new Vec3(0.2, 0.2, 1)));
+    const upper_orange = new Lambertian(new Solid_Colour(new Vec3(1, 0.5, 0)));
+    const lower_teal = new Lambertian(new Solid_Colour(new Vec3(0.2, 0.8, 0.8)));
+
+    world.add(new Quad(new Vec3(-3, -2, 5), new Vec3(0, 0, -4), new Vec3(0, 4, 0), left_red));
+    world.add(new Quad(new Vec3(-2, -2, 0), new Vec3(4, 0, 0), new Vec3(0, 4, 0), back_green));
+    world.add(new Quad(new Vec3(3, -2, 1), new Vec3(0, 0, 4), new Vec3(0, 4, 0), right_blue));
+    world.add(new Quad(new Vec3(-2, 3, 1), new Vec3(4, 0, 0), new Vec3(0, 0, 4), upper_orange));
+    world.add(new Quad(new Vec3(-2, -3, 5), new Vec3(4, 0, 0), new Vec3(0, 0, -4), lower_teal));
+
+    const cam = new Camera(new Vec3(0, 0, 9), new Vec3(0, 0, 0), 80, 1, 0, image);
+    cam.render(context, world);
+}
+
+switch(5) {
     case 1: random_spheres();       break;
     case 2: two_spheres();          break;
     case 3: earth();                break;
     case 4: two_perlin_spheres();   break;
+    case 5: quads();                break;
 }

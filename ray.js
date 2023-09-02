@@ -16,5 +16,12 @@ export class Ray {
     origin = new Vec3;
     direction = new Vec3;
     time = 0;
-    at(t) {return add(this.origin, mul(this.direction, t))}
+    /**
+     * Returns the position of the ray at extent `t`.
+     * @param {Number} t 
+     * @returns {Vec3}
+     */
+    at(t) {
+        return add(this.origin, mul(this.direction, t));
+    }
 }
