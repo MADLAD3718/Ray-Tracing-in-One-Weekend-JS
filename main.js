@@ -1,11 +1,11 @@
+import { Checker_Texture, Image_Texture, Noise_Texture, Solid_Colour } from "./texture.js";
 import { Vec3, add, length, mul, randVec3, sub } from "./vector.js";
 import { Dielectric, Lambertian, Metal } from "./material.js";
-import { Checker_Texture, Image_Texture, Solid_Colour } from "./texture.js";
 import { Hittable_List } from "./hittable_list.js";
+import { Interval } from "./interval.js";
 import { Sphere } from "./sphere.js";
 import { Camera } from "./camera.js";
 import { BVH_Node } from "./bvh.js";
-import { Interval } from "./interval.js";
 
 /** @type {HTMLCanvasElement} */
 const canvas = document.getElementById("screen");
@@ -91,4 +91,19 @@ function earth() {
 
 }
 
-earth();
+function two_perlin_spheres() {
+    const world = new Hittable_List;
+    const perlin_texture = new Noise_Texture(2);
+    world.add(new Sphere(new Vec3(0, -1000, 0), undefined, 1000, new Lambertian(perlin_texture)));
+    world.add(new Sphere(new Vec3(0, 2, 0), undefined, 2, new Lambertian(perlin_texture)));
+
+    const cam = new Camera(new Vec3(13, 2, 3), new Vec3(0, 0, 0), 20, 1, 0, image);
+    cam.render(context, world);
+}
+
+switch(4) {
+    case 1: random_spheres();       break;
+    case 2: two_spheres();          break;
+    case 3: earth();                break;
+    case 4: two_perlin_spheres();   break;
+}

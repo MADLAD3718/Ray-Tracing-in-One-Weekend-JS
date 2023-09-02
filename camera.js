@@ -134,7 +134,7 @@ export class Camera {
         const hit = world.intersect(ray, new Interval(1e-8, Infinity));
         if (hit.hasHit) {
             const scattered = hit.material.scatter(ray, hit);
-            return mul(this.rayColour(world, scattered, depth - 1), hit.material.attenuation(hit.uv));
+            return mul(this.rayColour(world, scattered, depth - 1), hit.material.attenuation(hit.uv, hit.position));
         }
 
         const skyUpColour = new Vec3(0.5, 0.7, 1);
