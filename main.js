@@ -172,11 +172,11 @@ function cornell_smoke() {
     const red = new Lambertian(new Solid_Colour(new Vec3(0.65, 0.05, 0.05)));
     const white = new Lambertian(new Solid_Colour(new Vec3(0.73, 0.73, 0.73)));
     const green = new Lambertian(new Solid_Colour(new Vec3(0.12, 0.45, 0.15)));
-    const light = new Light(new Solid_Colour(new Vec3(15, 15, 15)));
+    const light = new Light(new Solid_Colour(new Vec3(7, 7, 7)));
 
     world.add(new Quad(new Vec3(555, 0, 0), new Vec3(0, 555, 0), new Vec3(0, 0, 555), green));
     world.add(new Quad(new Vec3(0, 0, 0), new Vec3(0, 555, 0), new Vec3(0, 0, 555), red));
-    world.add(new Quad(new Vec3(343, 554, 332), new Vec3(-130, 0, 0), new Vec3(0, 0, -105), light));
+    world.add(new Quad(new Vec3(113, 554, 127), new Vec3(330, 0, 0), new Vec3(0, 0, 305), light));
     world.add(new Quad(new Vec3(0, 0, 0), new Vec3(555, 0, 0), new Vec3(0, 0, 555), white));
     world.add(new Quad(new Vec3(555, 555, 555), new Vec3(-555, 0, 0), new Vec3(0, 0, -555), white));
     world.add(new Quad(new Vec3(0, 0, 555), new Vec3(555, 0, 0), new Vec3(0, 555, 0), white));
@@ -196,7 +196,49 @@ function cornell_smoke() {
     cam.render(context, world);
 }
 
-switch(8) {
+function final_scene() {
+    const boxes1 = new Hittable_List;
+    const ground = new Lambertian(new Solid_Colour(new Vec3(0.48, 0.83, 0.53)));
+
+    const boxes_per_side = 6;
+    for (let i = 0; i < boxes_per_side; ++i) for (let j = 0; j < boxes_per_side; ++j) {
+        const w = 250;
+        const x0 = (i - boxes_per_side / 2) * w + 273;
+        const z0 = (j - boxes_per_side / 2) * w + 280;
+        const y0 = 50;
+        const x1 = x0 + w;
+        const y1 = y0 + Math.random() * 50;
+        const z1 = z0 + w;
+
+        boxes1.add(box(new Vec3(x0, y0, z0), new Vec3(x1, y1, z1), ground));
+    }
+    
+    const world = new Hittable_List;
+    world.add(boxes1);
+
+    const light = new Light(new Solid_Colour(new Vec3(7, 7, 7)));
+    world.add(new Quad(new Vec3(123, 554, 147), new Vec3(300, 0, 0), new Vec3(0, 0, 265), light));
+
+    const sphere_material = new Lambertian(new Solid_Colour(new Vec3(0.7, 0.3, 0.1)));
+    world.add(new Sphere(new Vec3(400, 400, 200), undefined, 50, sphere_material));
+
+    world.add(new Sphere(new Vec3(260, 150, 45), undefined, 50, new Dielectric(1.5)));
+    world.add(new Sphere(new Vec3(0, 150, 145), undefined, 50, new Metal(new Solid_Colour(new Vec3(0.8, 0.8, 0.9)), 1)));
+
+    const boundry = new Sphere(new Vec3(360, 170, 145), undefined, 70, new Dielectric(1.5));
+    world.add(boundry);
+    world.add(new Constant_Medium(boundry, 0.2, new Vec3(0.2, 0.4, 0.9)));
+    const boundry2 = new Sphere(new Vec3(0, 0, 0), undefined, 5000, new Dielectric(1.5));
+    world.add(new Constant_Medium(boundry2, 0.0001, new Vec3(1, 1, 1)));
+    
+    const pertext = new Noise_Texture(0.1);
+    world.add(new Sphere(new Vec3(220, 280, 300), undefined, 80, new Lambertian(pertext)));
+
+    const cam = new Camera(new Vec3(478, 278, -600), new Vec3(278, 278, 0), 40, 1, 0, new Vec3(0, 0, 0), image);
+    cam.render(context, world);
+}
+
+switch(9) {
     case 1: random_spheres();       break;
     case 2: two_spheres();          break;
     case 3: earth();                break;
@@ -205,4 +247,5 @@ switch(8) {
     case 6: simple_light();         break;
     case 7: cornell_box();          break;
     case 8: cornell_smoke();        break;
+    case 9: final_scene();          break;
 }

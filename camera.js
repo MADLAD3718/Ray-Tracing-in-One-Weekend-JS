@@ -48,7 +48,7 @@ export class Camera {
     pos;
     background;
     spp = 100;
-    max_bounces = 10;
+    max_bounces = 5;
     /**
      * @type {ImageData}
      * @readonly
