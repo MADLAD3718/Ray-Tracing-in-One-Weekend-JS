@@ -1,4 +1,4 @@
-import { Vec3, dot, normRandDisk, randCosHemisphere, reflect, reflectance, refract } from "./vector.js";
+import { Vec3, dot, normRandDisk, randCosHemisphere, randSphere, reflect, reflectance, refract } from "./vector.js";
 import { HitInfo } from "./hittable.js";
 import { Texture } from "./texture.js";
 import { Basis } from "./basis.js";
@@ -153,5 +153,36 @@ export class Light extends Material {
      */
     emitted(uv, p) {
         return this.emission.sample(uv, p);
+    }
+}
+
+export class Isotropic extends Material {
+    /**
+     * Creates a new `Isotropic` material instance.
+     * @param {Vec3} colour 
+     * @returns {Isotropic}
+     */
+    constructor(colour) {
+        super();
+        this.colour = colour;
+    }
+    colour;
+    /**
+     * Scatters an incident ray off of the material, returning the scattered ray.
+     * @param {Ray} ray 
+     * @param {HitInfo} hit 
+     * @returns {Ray}
+     */
+    scatter(ray, hit) {
+        return new Ray(hit.position, randSphere(), ray.time);
+    }
+    /**
+     * Returns the attenuation of the material.
+     * @param {Vec3} uv 
+     * @param {Vec3} p 
+     * @returns {Vec3}
+     */
+    attenuation(uv, p) {
+        return this.colour;
     }
 }

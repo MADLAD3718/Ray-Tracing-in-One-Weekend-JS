@@ -9,6 +9,7 @@ import { BVH_Node } from "./bvh.js";
 import { Quad } from "./quad.js";
 import { box } from "./box.js";
 import { Rotate_Y, Translate } from "./hittable.js";
+import { Constant_Medium } from "./medium.js";
 
 /** @type {HTMLCanvasElement} */
 const canvas = document.getElementById("screen");
@@ -165,7 +166,37 @@ function cornell_box() {
     cam.render(context, world);
 }
 
-switch(7) {
+function cornell_smoke() {
+    const world = new Hittable_List;
+
+    const red = new Lambertian(new Solid_Colour(new Vec3(0.65, 0.05, 0.05)));
+    const white = new Lambertian(new Solid_Colour(new Vec3(0.73, 0.73, 0.73)));
+    const green = new Lambertian(new Solid_Colour(new Vec3(0.12, 0.45, 0.15)));
+    const light = new Light(new Solid_Colour(new Vec3(15, 15, 15)));
+
+    world.add(new Quad(new Vec3(555, 0, 0), new Vec3(0, 555, 0), new Vec3(0, 0, 555), green));
+    world.add(new Quad(new Vec3(0, 0, 0), new Vec3(0, 555, 0), new Vec3(0, 0, 555), red));
+    world.add(new Quad(new Vec3(343, 554, 332), new Vec3(-130, 0, 0), new Vec3(0, 0, -105), light));
+    world.add(new Quad(new Vec3(0, 0, 0), new Vec3(555, 0, 0), new Vec3(0, 0, 555), white));
+    world.add(new Quad(new Vec3(555, 555, 555), new Vec3(-555, 0, 0), new Vec3(0, 0, -555), white));
+    world.add(new Quad(new Vec3(0, 0, 555), new Vec3(555, 0, 0), new Vec3(0, 555, 0), white));
+
+    let box1 = box(new Vec3(0, 0, 0), new Vec3(165, 330, 165), white);
+    box1 = new Rotate_Y(box1, 15);
+    box1 = new Translate(box1, new Vec3(265, 0, 295));
+    
+    let box2 = box(new Vec3(0, 0, 0), new Vec3(165, 165, 165), white);
+    box2 = new Rotate_Y(box2, 342);
+    box2 = new Translate(box2, new Vec3(130, 0, 65));
+
+    world.add(new Constant_Medium(box1, 0.01, new Vec3(0, 0, 0)));
+    world.add(new Constant_Medium(box2, 0.01, new Vec3(1, 1, 1)));
+    
+    const cam = new Camera(new Vec3(278, 278, -800), new Vec3(278, 278, 0), 40, 1, 0, new Vec3(0, 0, 0), image);
+    cam.render(context, world);
+}
+
+switch(8) {
     case 1: random_spheres();       break;
     case 2: two_spheres();          break;
     case 3: earth();                break;
@@ -173,4 +204,5 @@ switch(7) {
     case 5: quads();                break;
     case 6: simple_light();         break;
     case 7: cornell_box();          break;
+    case 8: cornell_smoke();        break;
 }
