@@ -188,6 +188,19 @@ export function reflectance(i, n, eta) {
 }
 
 /**
+ * Rotates `v` about the Y axis by angle `theta`.
+ * @param {Vec3} v 
+ * @param {Number} sint 
+ * @param {Number} cost 
+ * @returns {Vec3}
+ */
+export function rotateY(v, sint, cost) {
+    const x = cost * v.x + sint * v.z;
+    const z = -sint * v.x + cost * v.z;
+    return new Vec3(x, v.y, z);
+}
+
+/**
  * Returns a Vector with 3 random values.
  * @returns {Vec3}
  */
@@ -234,7 +247,7 @@ export function normRandDisk(r) {
     // hemisphere distribution, which I feel like is one of the craziest
     // math discoveries I've personally come accross. It also acts as a 
     // proof that a cosine-weighted hemisphere distribution can be achieved
-    // through projecting the unit disk onto the unit sphere distribution.
+    // through projecting the unit disk onto the unit sphere.
     const u = Math.random();
     const phi = 2 * Math.PI * Math.random();
     const sint = r * Math.sqrt(u);

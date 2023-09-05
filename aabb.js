@@ -19,6 +19,18 @@ export class AABB {
     y = new Interval;
     z = new Interval;
     /**
+     * Offsets the bounding box by a value.
+     * @param {Vec3} offset 
+     */
+    offset(offset) {
+        this.x.min += offset.x;
+        this.x.max += offset.x;
+        this.y.min += offset.y;
+        this.y.max += offset.y;
+        this.z.min += offset.z;
+        this.z.max += offset.z;
+    }
+    /**
      * Expands the bounds of the `AABB`.
      * @param {Number} delta 
      */

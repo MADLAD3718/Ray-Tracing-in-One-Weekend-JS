@@ -78,7 +78,6 @@ export class Camera {
         let j = 0;
         const start_time = performance.now();
         const render_id = setInterval(() => {
-            context.fillRect(0, 0, 1, 1);
             for (let i = 0; i < this.image.width; ++i) {
                 const ipos = new Vec3(i, j, 0);
                 let colour = new Vec3;

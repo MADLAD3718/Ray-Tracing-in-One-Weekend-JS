@@ -7,6 +7,8 @@ import { Sphere } from "./sphere.js";
 import { Camera } from "./camera.js";
 import { BVH_Node } from "./bvh.js";
 import { Quad } from "./quad.js";
+import { box } from "./box.js";
+import { Rotate_Y, Translate } from "./hittable.js";
 
 /** @type {HTMLCanvasElement} */
 const canvas = document.getElementById("screen");
@@ -148,6 +150,16 @@ function cornell_box() {
     world.add(new Quad(new Vec3(0, 0, 0), new Vec3(555, 0, 0), new Vec3(0, 0, 555), white));
     world.add(new Quad(new Vec3(555, 555, 555), new Vec3(-555, 0, 0), new Vec3(0, 0, -555), white));
     world.add(new Quad(new Vec3(0, 0, 555), new Vec3(555, 0, 0), new Vec3(0, 555, 0), white));
+
+    let box1 = box(new Vec3(0, 0, 0), new Vec3(165, 330, 165), white);
+    box1 = new Rotate_Y(box1, 15);
+    box1 = new Translate(box1, new Vec3(265, 0, 295));
+    world.add(box1)
+
+    let box2 = box(new Vec3(0, 0, 0), new Vec3(165, 165, 165), white);
+    box2 = new Rotate_Y(box2, 342);
+    box2 = new Translate(box2, new Vec3(130, 0, 65));
+    world.add(box2)
 
     const cam = new Camera(new Vec3(278, 278, -800), new Vec3(278, 278, 0), 40, 1, 0, new Vec3(0, 0, 0), image);
     cam.render(context, world);
